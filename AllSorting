@@ -1,0 +1,246 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+using namespace std;
+
+class Sorting{
+	public:
+		//these two functions will be used to initialize / print for each sorting method
+		void init(vector<int>& vect, int s){
+		//s = SIZE
+		for(int i = 0; i < s; i++){
+			int b = 1 + rand() % 10000;
+			vect.push_back(b);
+			//cout << vect[i] << endl;
+			}	
+		}
+		/*
+		void print(vector<int>& vect, int s){
+				for(int i = 0; i < s; i++){
+				cout << vect[i] << " " << endl;
+				}
+		}
+		*/
+		
+		void insertionSort(vector<int>& vect, int s){
+			int temp, i, j;
+			for(i = 0; i < s-1; i++){
+				//inner loop will look to one position to the right
+				//and compare to the outloop that is the the current index
+				j = i + 1;
+				//temp is holding the value that is one ahead of the outer loop
+				//for comparison
+				temp = vect[j];
+				//while loop is comparing the current j to the outerloop index
+				while(j > 0 && temp < vect[j-1]){
+					//you take the index that is less than, grab it and shift it to the right
+					vect[j] = vect[j-1];
+					//then move to the left
+					j--;
+					}
+				//put the index in the correct position
+				vect[j] = temp;
+			}
+			for(int k = 0; k < s; k++){
+				cout << vect[k] << endl;
+			}
+		}
+		
+		void selectionSort(vector<int>& vect, int s){
+			int low;
+			int temp; // for switching the values
+			for(int i = 0; i < s-1; i++){
+				//low = vect[0], just setting it to the lowest value so far for comparing later
+				low = i;
+				//j starts at i + 1 because we are comparing the next index to the one to the left
+				for(int j = i+1; j < s; j++){
+					if(vect[j] < vect[low]){
+						// means that the 'low' is not the lowest 
+						//reset the low = j
+						low = j;
+						//after we have finsihed the j loop, we will have identified the lowest element, which will now be 'j'
+						//we will have compared each value at this point
+					}
+				}
+				temp = vect[low];
+				vect[low] = vect[i];
+				vect[i] = temp;
+			}
+			for(int k = 0; k < s; k++){
+				cout << vect[k] << endl;
+			}
+		}
+
+		void merge(vector<int>& vect, int l, int m, int r){
+			int i = 1; // starting index for the left sub array
+			int j = m + 1; // starting index for the right sub array
+			int k = 1; // starting index for the temp array
+			
+			vector<int> temp; // temporary
+			// i - m (left sub array)
+			// j - r (right sub array)
+			while(i <= m && j <= r){
+				if(vect[i] <= vect[j]){
+					temp[k] = vect[i]; // vect[i] is smaller than vect[j]
+					i++;
+					k++;
+				}
+				else{
+					temp[k] = vect[j]; // vect[j] is smaller than vect[i]
+					j++;
+					k++;
+				}
+			}
+			while(i <= m){
+				temp[k] = vect[i]; // copying all elements from left sub array as it is
+				i++;
+				k++;
+			}
+			while(j <= r){
+				temp[k] = vect[j]; // copying all elements from the right sub array as it is
+				j++;
+				k++;
+			}
+			for(int s = 1; s <=r; s++){
+				if( s > 5 ) {
+					cout << "HELLO";
+				}
+				vect[s] = temp[s-l];
+			}
+			
+		}
+
+		
+		//recursive, divide and conquer
+		//takes in the vectorm left index and the right index as parameters
+		void mergeSort(vector<int>& vect, int l, int r){
+			//checks during the loops to see if there are still sub arrays (or in this case vectors)
+			if(l < r){
+				//gets the mid point
+				int m = ((l + r) / 2);
+				// now to call the mergeSort on the left and the right vectors
+				//index 0 - the midpoint for the left sub arrays
+				mergeSort(vect, l, m);
+				//right side of the array for sorting
+				mergeSort(vect, m+1, r);
+				merge(vect, l, m, r);
+			}
+		}
+
+		
+		// quick sort
+		int partition(vector<int>& vect, int start, int end){
+			int pivot = vect[start];
+			int count = 0;
+			for(int i = start + 1; i <= end; i++){
+				if(vect[i] <= pivot){
+					count ++;
+				}
+			}
+				int pivotIndex = start + count;
+				swap(vect[pivotIndex], vect[start]);
+				int i = start, j = end;
+				while(i < pivotIndex && j > pivotIndex){
+					while(vect[i] <= pivot){
+						i++;
+					}
+					while(vect[j] > pivot){
+						j--;
+					}
+					if(i < pivotIndex && j > pivotIndex){
+						swap(vect[i++], vect[j--]);
+					}
+				}
+				return pivotIndex;
+		}
+		
+		void quickSort(vector<int>& vect, int start, int end){
+			// base case
+			if(start >= end){
+				return;
+			}
+			int p = partition(vect,start,end);
+			
+			quickSort(vect,start, p-1);
+			quickSort(vect,p+1, end);
+			
+		}
+		
+		void heapify(vector<int>& vect, int n, int i){
+			//n = size
+			int largest = i;
+			int l = 2 * i + 1;
+			int r = 2 * i + 2;
+			//if left child is larger than root
+			if(l < n && vect[r] > vect[largest]){
+				largest = l;
+			}
+			//if right child is larger than the largest so far
+			if(r < n && vect[r] > vect[largest]){
+				largest = r;
+			}
+			//if largest is not root
+			if(largest != i){
+				swap(vect[i], vect[largest]);
+				
+				//recursivly heapify the affected subtree
+				heapify(vect, n, largest);
+			}
+		}
+		
+		void heapSort(vector<int>& vect, int n){
+			//n = size
+			//build the beap (rearrange the array)
+			for(int i = n / 2 - 1; i >= 0; i--){
+				heapify(vect, n , i);
+			}
+			//one by one extract an element from heap
+			for(int i = n - 1; i > 0; i--){
+				//move current root to the end
+				swap(vect[0], vect[i]);
+				heapify(vect, i , 0);
+			}
+			
+		}
+};
+		
+		
+		
+		
+
+int main(){
+	srand((unsigned)time(NULL));
+	int SIZE;
+	vector<int> vect;
+	cout << "how many numbers do you wish to input into the sorting algorithms?" << endl;
+	cin >> SIZE;
+	//insertion sort
+	//init will be our function to initialize the vector
+	Sorting sorting;
+	sorting.init(vect, SIZE);
+	cout << "insertion sort" << endl;
+	sorting.insertionSort(vect, SIZE);
+	cout << "selection sort" << endl;
+	sorting.selectionSort(vect, SIZE);
+	cout << "merge sort" << endl;
+	cout << "i got a seg fault but i honeslty have no idea"<< endl;
+	cout << "whats wrong with my code, you can check over what i have" << endl;
+	sorting.mergeSort(vect, 0, (vect.size() - 1));
+	cout << "quick sort" << endl;
+	sorting.quickSort(vect, 0 , (SIZE - 1));
+	for(int i = 0; i < vect.size(); i++){
+		cout << vect[i] << endl;
+	}
+	cout << "heap sort" << endl;
+	sorting.heapSort(vect, SIZE);
+	for(int i = 0; i < vect.size(); i++){
+		cout << vect[i] << endl;
+	}
+	
+
+	
+	
+	
+	
+	return 0;
+}
